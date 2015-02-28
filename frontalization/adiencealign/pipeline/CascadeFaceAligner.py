@@ -10,6 +10,7 @@ import os
 from adiencealign.landmarks_detection.landmarks_detector import detect_landmarks
 from adiencealign.common.landmarks import read_fidu, unwarp_fidu, draw_fidu
 import cv2
+import time as time
 
 class CascadeFaceAligner(object):
     '''
@@ -40,26 +41,34 @@ class CascadeFaceAligner(object):
         input_files2 = glob.glob(os.path.join(input_folder, '*.png'))
         input_files = input_files1 + input_files2
         N = len(input_files)
-        
+        skipped_images = 0
+        start_time = time.time()
         for n_file, input_file in enumerate(input_files):
-            a,b = os.path.split(input_file)
-            done_file = os.path.join(a, '.done.' + b.rsplit('.',1)[0])
-            
-            if os.path.exists(done_file):
-                continue
-            
-            print "... processing", input_file
+            print "------------------------------------"
+            try:
+                a,b = os.path.split(input_file)
+                done_file = os.path.join(a, '.done.' + b.rsplit('.',1)[0])
+                
+                if os.path.exists(done_file):
+                    continue
+                
+                print "... processing", input_file
 
-            target_faces_file = os.path.join( output_folder, os.path.split(input_file)[1].rsplit('.',1)[0] + '.faces.txt')
-            
-            faces_file = self.face_finder.create_faces_file( input_file, is_overwrite = False, target_file = target_faces_file )
-            sub_images_files = self.face_finder.create_sub_images_from_file( original_image_file = input_file, 
-                                                    faces_file = faces_file, 
-                                                    target_folder = output_folder,
-                                                    img_type = 'jpg')
-            #touch
-            open(done_file,'w').close()
-            print "Detected on %d / %d files" %(n_file, N)
+                target_faces_file = os.path.join( output_folder, os.path.split(input_file)[1].rsplit('.',1)[0] + '.faces.txt')
+                
+                faces_file = self.face_finder.create_faces_file( input_file, is_overwrite = False, target_file = target_faces_file )
+                sub_images_files = self.face_finder.create_sub_images_from_file( original_image_file = input_file, 
+                                                        faces_file = faces_file, 
+                                                        target_folder = output_folder,
+                                                        img_type = 'jpg')
+                #touch
+                open(done_file,'w').close()
+                print "Detected on %d / %d files" %(n_file, N)
+                print "Elapsed Time (min): ", int(1.0*(time.time()-start_time)/60)
+            except:
+                print "INFO: Error on image, skipping image..."
+                skipped_images += 1
+        print "NUM SKIPPED IMAGES: ", skipped_images
         
     def align_faces(self, input_images, output_path, fidu_max_size = None, fidu_min_size = None, is_align = True, is_draw_fidu = False, delete_no_fidu = False):
         '''
@@ -82,8 +91,11 @@ class CascadeFaceAligner(object):
             if not (fidu_score is not None and yaw_angle in self.valid_angles):
                 # skip face
                 if delete_no_fidu:
-                    os.remove(fidu_file)
-                    os.remove(input_image)
+                    try:
+                        os.remove(fidu_file)
+                        os.remove(input_image)
+                    except:
+                        continue
                 continue
             
             if is_align:

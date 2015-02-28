@@ -28,6 +28,7 @@ print "xml directory is: " + xml_dir
 face_cascade = cv2.CascadeClassifier(xml_dir + "/haarcascade_frontalface_default.xml")
 
 # Iterate through all pictures and apply the detection algorithm.
+i = 0
 for file_path in glob.glob(data_dir + "/*.jpg"):
     img = cv2.imread(file_path)
     file_name = os.path.basename(file_path)
@@ -40,6 +41,9 @@ for file_path in glob.glob(data_dir + "/*.jpg"):
         output_file_name = "%s/out_%02d_%s" %(output_dir, face_index, file_name)
         cv2.imwrite(output_file_name, img[y:y+h, x:x+w])
         face_index += 1
+    i += 1
+    if i % 1000 == 0:
+    	print "Finished: ", i
 
 #cv2.imshow('img',img)
 #cv2.waitKey(0)

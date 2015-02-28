@@ -20,9 +20,15 @@ class Test(unittest.TestCase):
         '''
         there is no assert here, just observe the outputs in tests/outputs/pipeline/
         '''
-        input_folder = './resources/pipeline/'
-        faces_folder = './outputs/pipeline/faces/'
-        aligned_folder = './outputs/pipeline/aligned/'
+        NUM = 3
+
+        #input_folder = '/home/albert/Desktop/frontalization_multiple/' + str(NUM) + '/adiencealign/tests/resources/pipeline/'
+        #faces_folder = '/home/albert/Desktop/frontalization_multiple/' + str(NUM) + '/adiencealign/tests/outputs/pipeline/faces/'
+        #aligned_folder = '/home/albert/Desktop/frontalization_multiple/' + str(NUM) + '/adiencealign/tests/outputs/pipeline/aligned/'
+
+        input_folder = '/media/albert/NewVolume/face_project/' + str(NUM) + '/resources/pipeline/'
+        faces_folder = '/media/albert/NewVolume/face_project/' + str(NUM) + '/outputs/pipeline/faces/'
+        aligned_folder = '/media/albert/NewVolume/face_project/' + str(NUM) + '/outputs/pipeline/aligned/'
         cascade_face_aligner = CascadeFaceAligner()
         
         # detect cascade           

@@ -20,17 +20,11 @@ class Test(unittest.TestCase):
         Assert that the detected faces are correct, and draw them.
         Also creates output images of the padded faces
         '''
-        fnames = ['./resources/cascade/janice1.jpg', './resources/cascade/janice2.png']
+        fnames = ['./resources/cascade/janice2.jpg',
+        './resources/cascade/albert4.jpg',
+        './resources/cascade/albert5.jpg',
+        './resources/cascade/david1.jpg']
         
-        expected_faces = [[],[]]
-        
-        expected_faces[0].append(CascadeResult(box_with_score = ([61,62,132,132], 344), cascade_type = 'haar', angle = 0.0))
-        
-        expected_faces[1].append(CascadeResult(box_with_score = ([327,101,119,119], 244), cascade_type = 'haar', angle = 0.0))
-        expected_faces[1].append(CascadeResult(box_with_score = ([238,107,111,111], 135), cascade_type = 'lbp', angle = 0.0))
-        expected_faces[1].append(CascadeResult(box_with_score = ([163,48,93,93], 51), cascade_type = 'lbp', angle = 0.0))
-        expected_faces[1].append(CascadeResult(box_with_score = ([433,86,95,95], 92), cascade_type = 'lbp', angle = 0.0))
-    
         for n_images, fname in enumerate(fnames):
             _, base_fname = os.path.split(fname)
             img = cv2.imread(fname)
@@ -43,7 +37,6 @@ class Test(unittest.TestCase):
             img_to_draw_on = img.copy()
             
             for n_face, face in enumerate(faces):
-                #self.assertAlmostEqual(face.overlap(expected_faces[n_images][n_face]) / face.area, 1.00, 0.01)
                 
                 draw_rect(img_to_draw_on, face)
                 
@@ -64,16 +57,10 @@ class Test(unittest.TestCase):
         Assert that the detected faces are correct, and draw them.
         Also creates output images of the padded faces
         '''
-        fnames = ['./resources/cascade/janice1.jpg', './resources/cascade/janice2.png']
-        
-        expected_results = [['x,y,dx,dy,score,angle,type\n',
-                             '61,62,132,132,344,0.0,haar'],
-                            ['x,y,dx,dy,score,angle,type\n',
-                             '327,101,121,121,154,0.0,lbp\n',
-                             '237,106,113,113,139,0.0,lbp\n',
-                             '164,49,91,91,49,0.0,lbp\n',
-                             '434,86,94,94,95,0.0,lbp\n']
-                            ]
+        fnames = ['./resources/cascade/janice2.jpg',
+        './resources/cascade/albert4.jpg',
+        './resources/cascade/albert5.jpg',
+        './resources/cascade/david1.jpg']
         
         for n_image in range(len(fnames)):
             fname = fnames[n_image]
@@ -96,7 +83,6 @@ class Test(unittest.TestCase):
             with open(faces_file,'r') as fid:
                 for i in range(len(expected_result)):
                     line = fid.readline()
-                    #self.assertEqual(line.strip(), expected_result[i].strip())
                     
                             
 if __name__ == "__main__":
