@@ -1,13 +1,14 @@
 # Getting Started with Caffe
 
-Modified by Albert, Made by Berkeley
+Modified by Albert (March 4, 2015), Documentation originally from the official Caffe repo.
 
 ## Contents
 
 1. Installing Caffe
 2. Data Preparation
+3. Hyperparameters
 
-## Installing Caffe
+## 1. Installing Caffe
 
 Installing Caffe section is from: https://github.com/BVLC/caffe/wiki/Ubuntu-14.04-VirtualBox-VM
 
@@ -74,7 +75,7 @@ This is a guide to setting up Caffe in a 14.04 virtual machine with CUDA 6.5 and
   * `./examples/mnist/train_lenet.sh`
   * See http://caffe.berkeleyvision.org/gathered/examples/mnist.html for more information...
 
-## Data Preparation
+## 2. Data Preparation
 
 See: http://caffe.berkeleyvision.org/gathered/examples/imagenet.html
 
@@ -103,7 +104,7 @@ If you get the "Check failed: mkdir(db_path, 0744)" error, that means the lmdb f
 
 To start training, run: `./build/tools/caffe train --solver=models/bvlc_reference_caffenet/solver.prototxt`
 
-## Hyperparameters
+## 3. Hyperparameters
 Note these files are located in: `CAFFE_HOME/models/model_name_here/`
 
 * On the machine you will use (only need to do once on farmshare, will work for any machine), download and build Caffe. Follow the notes above for building. Note: the readme above (at least the part from Berkeley for building Caffe) is for building Caffe on a VM with a CPU only. Sometimes a step won't apply so use common sense to skip it or not.
