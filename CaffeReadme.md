@@ -1,4 +1,6 @@
-# Kaggle Data Science Bowl 2015
+# Getting Started with Caffe
+
+Modified by Albert, Made by Berkeley
 
 ## Contents
 
