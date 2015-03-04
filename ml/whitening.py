@@ -1,7 +1,7 @@
 
 #https://theclevermachine.wordpress.com/2013/03/30/the-statistical-whitening-transform/
-inputdir = "/Users/janicelan/Desktop/Current/231a_data/faces/"
-outputdir = "/Users/janicelan/Desktop/Current/231a_data/whitened/"
+inputdir = "/home/albert/Desktop/pic5_dataset/singles/"
+outputdir = "/home/albert/Desktop/pic5_dataset/whitened/"
 
 # https://gist.github.com/duschendestroyer/5170087
 import numpy as np
@@ -15,14 +15,16 @@ import os
 # filename = '00026eb27c4918da6470f236536be805_face_0.jpg'
 allfiles = os.listdir(inputdir)
 imagefiles = [f for f in allfiles if f[-4:] == '.jpg']
-chunksize = len(imagefiles)
+#chunksize = len(imagefiles)
+chunksize = 10
+RESIZED = 64
 
-X = np.zeros((chunksize, 256*256*3))
+X = np.zeros((chunksize, RESIZED*RESIZED*3))
 
 for i in xrange(chunksize):
-    img = misc.imresize(misc.imread(inputdir + imagefiles[i]), (256,256,3))
+    img = misc.imresize(misc.imread(inputdir + imagefiles[i]), (RESIZED,RESIZED,3))
     # print np.reshape(img, (1, 256*256*3))
-    X[i,:] = np.reshape(img, (1, 256*256*3))
+    X[i,:] = np.reshape(img, (1, RESIZED*RESIZED*3))
     # X = misc.imresize(img, (256,256,3))[:,:,i]
     # plt.imshow(X)
     # plt.figure()
@@ -30,6 +32,7 @@ for i in xrange(chunksize):
 # the actual whitening: ########
 X -= np.mean(X, axis=0) # zero-center the data (important)
 cov = np.dot(X.T, X) / X.shape[0] # get the data covariance matrix
+
 
 U,S,V = np.linalg.svd(cov)
 
@@ -44,7 +47,7 @@ Xwhite = Xrot / np.sqrt(S + 1e-5)
 #####################
 
 for i in xrange(chunksize):
-    newimg = Xwhite[i,:].reshape((256,256,3))
+    newimg = Xwhite[i,:].reshape((RESIZED,RESIZED,3))
     misc.imsave(outputdir + imagefiles[i], newimg)
 
 # plt.imshow(newimg)
