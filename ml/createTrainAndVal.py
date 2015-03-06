@@ -66,7 +66,7 @@ SINGLES_DIR = FACES_ROOT + "singles/"
 
 # Input labels file
 INPUT_LABELS_FILE = FACES_ROOT + "all_" + LABEL + ".txt"
-SUBDATASET_ROOT = FACES_ROOT + LABEL + "/"
+SUBDATASET_ROOT = "/home/ec2-user/" + LABEL + "/"
 
 # A class which keeps track of a filename, label pair
 class DataPoint:
@@ -98,7 +98,7 @@ class DataPoint:
 print "Label:\t\t" + LABEL
 
 # Get list of all files present in singles folder
-singles_list = os.listdir(SINGLES_DIR)
+singles_list = set(os.listdir(SINGLES_DIR))
 
 # Get the list of images in our labels file that are present in singles folder
 # The ready_set is defined as the set of images for which we have labels for
@@ -122,7 +122,7 @@ for line in lines:
 		found_count += 1
 
 	count += 1
-	if count % 100 == 0:
+	if count % 100000 == 0:
 		print "Scanned the labels file: " + str(count) + " / " + str(num_lines),
 		print "Found: " + str(found_count) + "\tElapsed: " + str((time.time()-start_time))
 input_file.close()
