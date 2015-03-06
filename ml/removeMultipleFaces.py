@@ -3,10 +3,8 @@ import re
 import shutil
 import time
 
-FACES_DIR = "/home/albert/Desktop/pic5_dataset/faces/"
-SINGLES_DIR = "/home/albert/Desktop/pic5_dataset/singles/"
-
-lines = labels_file.readlines()
+FACES_DIR = "/home/ec2-user/faces/"
+SINGLES_DIR = "/home/ec2-user/singles/"
 
 # This loop opens the FACES_DIR folder and counts the number of times
 # a face appears per image.
@@ -24,7 +22,7 @@ for filename in file_list:
 	else:
 		face_counts[user_id] = 1
 	count += 1
-	if count % 10000 == 0:
+	if count % 100000 == 0:
 		print "Built Dictionary: " + str(count) + "\tElapsed: " + str((time.time()-start_time))
 
 # Get the list of user_ids with single face detection
