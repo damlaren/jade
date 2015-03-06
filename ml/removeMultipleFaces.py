@@ -5,8 +5,8 @@ import shutil
 FACES_DIR = "/home/albert/Desktop/pic5_dataset/faces/"
 SINGLES_DIR = "/home/albert/Desktop/pic5_dataset/singles/"
 
-labels_file = open("all_gender.txt","r")
-single_labels_output_file = open("pic5_gender_all.txt","w")
+labels_file = open("/home/albert/Desktop/pic5_dataset/age/pic5_age_all.txt","r")
+single_labels_output_file = open("/home/albert/Desktop/pic5_dataset/age/pic5_age_singles.txt","w")
 
 lines = labels_file.readlines()
 
