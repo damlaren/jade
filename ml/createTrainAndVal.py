@@ -26,13 +26,13 @@ author: Albert Haque
 
 # The labels to use: must be one of: (exact match)
 # "age" "agr" "con" "ext" "gender" "neu" "ope" "SWL"
-LABEL = "agr"
+LABEL = "con"
 
 # This is the folder that contains the singles folder and where
 # all subdatasets will be stored. A subdataset is the dataset (train/val)
 # for a single label (e.g. age). See directory tree below
 # Please include the slash at the end
-FACES_ROOT = "/Users/albert/Desktop/pic5_working/"
+FACES_ROOT = "/home/ec2-user/faces_data/"
 
 """
 Output directory location. The folder structure will be like such:
@@ -108,8 +108,10 @@ ready_set = []
 
 input_file = open(INPUT_LABELS_FILE, "r")
 lines = input_file.readlines()
+num_lines = len(lines)
 
 count = 0
+found_count = 0
 start_time = time.time()
 for line in lines:
 	tokens = line.strip().split(' ')
@@ -117,11 +119,12 @@ for line in lines:
 	if tokens[0] in singles_list:
 		dp = DataPoint(tokens[0], tokens[1], LABEL)
 		ready_set.append(dp)
+		found_count += 1
 
 	count += 1
-	if count % 10000 == 0:
-		print "Creating Ready Set: Scanned: " + str(count) + "\tElapsed: " + str((time.time()-start_time))
-		break
+	if count % 100 == 0:
+		print "Scanned the labels file: " + str(count) + " / " + str(num_lines),
+		print "Found: " + str(found_count) + "\tElapsed: " + str((time.time()-start_time))
 input_file.close()
 
 num_ready = len(ready_set)

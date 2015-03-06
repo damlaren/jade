@@ -34,7 +34,7 @@ for key in face_counts:
 	if face_counts[key] == 1:
 		single_user_ids.append(key)
 	count += 1
-	if count % 10000 == 0:
+	if count % 100000 == 0:
 		print "Identifying Single Images, Scanned: " + str(count) + "\tElapsed: " + str((time.time()-start_time))
 
 print "Copying images into the singles directory..."
