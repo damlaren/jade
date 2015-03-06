@@ -7,6 +7,7 @@ import re
 import shutil
 import time
 import random
+import numpy as np
 
 """
 This script:
@@ -25,21 +26,19 @@ author: Albert Haque
 
 # The labels to use: must be one of: (exact match)
 # "age" "agr" "con" "ext" "gender" "neu" "ope" "SWL"
-LABEL = "age"
+LABEL = "agr"
 
-# Make sure to specify the folder with a slash at the end
-# Input folder consisting of ALL singles images
-INPUT_SINGLES_DIR = "/Users/albert/Desktop/pic5_working/singles/"
-
-# Input labels file (this is where you specify which predictor to use)
-# Leave the "LABEL" at the end. You will probably just change the first part of the location
-#INPUT_LABELS_FILE = "/Users/albert/Desktop/pic5_working/all_" + LABEL + ".txt"
-INPUT_LABELS_FILE = "/Users/albert/Desktop/pic5_working/pic5_age_train.years.txt"
+# This is the folder that contains the singles folder and where
+# all subdatasets will be stored. A subdataset is the dataset (train/val)
+# for a single label (e.g. age). See directory tree below
+# Please include the slash at the end
+FACES_ROOT = "/Users/albert/Desktop/pic5_working/"
 
 """
 Output directory location. The folder structure will be like such:
-TARGET_DIR
-	|- age
+FACES_ROOT
+	|- singles
+	|- age (will be created by this script)
 	    |- train
 	        |-- abcdefg12345.jpg
 	        |--       :
@@ -51,9 +50,9 @@ TARGET_DIR
 	    |- train.txt
 	    |- val.txt
 
-Where "age" is replaced by the label you choose
+* Where "age" is replaced by the label you choose
+* The "age" folder will be created by this script
 """
-TARGET_DIR = "/home/albert/Desktop/pic5_dataset/"
 
 # Out of our entire dataset (with labels),
 # how much should be allocated to the validation set
@@ -61,6 +60,13 @@ VAL_PERCENT = 0.05
 
 # END REQUIRED INPUTS
 #######################################################################
+
+# Input folder consisting of ALL singles images
+SINGLES_DIR = FACES_ROOT + "singles/"
+
+# Input labels file
+INPUT_LABELS_FILE = FACES_ROOT + "all_" + LABEL + ".txt"
+SUBDATASET_ROOT = FACES_ROOT + LABEL + "/"
 
 # A class which keeps track of a filename, label pair
 class DataPoint:
@@ -70,14 +76,29 @@ class DataPoint:
 		if label_type == "age":
 			# Caffe requires labels be integers (at least our setup does)
 			self.label = int(1.0*int(label)/365.25)
+		elif label_type == "gender":
+			self.label = int(label)
 		else:
-			self.label = int(float(label))
+			# Put data in the range of 1-100
+			self.label = int(float(label)*10)
+
+	def getFilename(self):
+		return self.filename
+
+	def getLabel(self):
+		return self.label
 
 	def __str__(self):
-		return self.filename + " " + str(label)
+		return self.filename + " " + str(self.label)
+
+############################################################
+# SCRIPT BEGINS HERE
+############################################################
+
+print "Label:\t\t" + LABEL
 
 # Get list of all files present in singles folder
-singles_list = os.listdir(INPUT_SINGLES_DIR)
+singles_list = os.listdir(SINGLES_DIR)
 
 # Get the list of images in our labels file that are present in singles folder
 # The ready_set is defined as the set of images for which we have labels for
@@ -99,95 +120,71 @@ for line in lines:
 
 	count += 1
 	if count % 10000 == 0:
-		print "Creating Ready Set. Scanned: " + str(count) + "\tElapsed: " + str((time.time()-start_time))
+		print "Creating Ready Set: Scanned: " + str(count) + "\tElapsed: " + str((time.time()-start_time))
+		break
 input_file.close()
 
-NUM_READY = len(ready_set)
-print "Num Images in Ready Set: " + str(NUM_READY)
+num_ready = len(ready_set)
 
 # Create a train and validation set
-randomized_ready_set = random.shuffle(ready_set)
-val_size = int(NUM_READY*VAL_PERCENT)
-print val_size
+np_ready_set = np.array(ready_set)
+np.random.shuffle(np_ready_set)
+val_size = int(num_ready*VAL_PERCENT)
+
+validation_set = np_ready_set[0:val_size]
+training_set = np_ready_set[val_size:]
+
+print "Ready Size:\t" + str(len(ready_set))
+print "Train Size:\t" + str(len(training_set))
+print "Val Size:\t" + str(len(validation_set))
 
 # Copy the images to the train/val folder
+TRAIN_DIR = SUBDATASET_ROOT + "train/"
+VAL_DIR = SUBDATASET_ROOT + "val/"
+
+created_flag = False
+
+if not os.path.exists(TRAIN_DIR):
+    os.makedirs(TRAIN_DIR)
+    print "Created the following directories:"
+    print "\t" + TRAIN_DIR
+    created_flag = True
 
 
-# Output the train/val labels
+if not os.path.exists(VAL_DIR):
+    os.makedirs(VAL_DIR)
+    if created_flag == False:
+    	print "Created the following directories:"
+    print "\t" + VAL_DIR
 
-"""
+# Copy the images into their train/val folder and output to the labels file
+train_labels_file = open(SUBDATASET_ROOT + LABEL + "_train.txt", "w")
+val_labels_file = open(SUBDATASET_ROOT + LABEL + "_val.txt", "w")
 
-lines = INPUT_LABELS_FILE.readlines()
-
-# This loop opens the FACES_DIR folder and counts the number of times
-# a face appears per image.
-file_list = os.listdir(FACES_DIR)
-
-for filename in file_list:
-	# If file is a txt or cfidu, ignore it
-	if "cfidu" in filename or "txt" in filename:
-		continue
-	id_end_index = filename.index('_')
-	user_id = filename[:id_end_index]
-	if user_id in face_counts:
-		face_counts[user_id] += 1
-	else:
-		face_counts[user_id] = 1
-
-# Get the list of user_ids with single face detection
-single_user_ids = []
-for key in face_counts:
-	if face_counts[key] == 1:
-		single_user_ids.append(key)
-
-
-# Copy the .jpg files to the singles folder
-for filename in single_user_ids:
-	# Not all images end with face_0 for some reason...
-	for i in xrange(0, 5):
-		src = FACES_DIR + filename + "_face_" + str(i) + ".jpg"
-		if os.path.isfile(src):
-			break
-	count += 1
-	dest = SINGLES_DIR + filename + ".jpg"
+print "Creating training set folder and labels...",
+for dp in training_set:
+	filename = dp.getFilename()
+	src = SINGLES_DIR + filename
+	dest = TRAIN_DIR + filename + ".jpg"
 	shutil.copy(src, dest)
 
+	# Write the label to file
+	train_labels_file.write(str(dp) + "\n")
 
-# Create a labels file consisting of the single images only
-# This loop below reads the gender labels for the ENTIRE dataset into gender_labels
-gender_labels = {}
-for line in lines:
-	tokens = line.strip().split(' ')
-	gender_labels[tokens[0]] = int(tokens[1])
+print " Done!"
+print "Creating validation set folder and labels...",
 
-# Only write the single labels. We then loop through our
-# singles array and get the correct label from the ALL gender_labels dict
-for key in single_user_ids:
-	key = key + ".jpg"
-	# Some user_ids won't have a gender label
-	if key not in gender_labels:
-		continue
-	# Write to file
-	single_labels_output_file.write(key + " " + str(gender_labels[key]) + "\n")
+for dp in validation_set:
+	filename = dp.getFilename()
+	# Not all images end with face_0 for some reason...
+	src = SINGLES_DIR + filename
+	dest = VAL_DIR + filename + ".jpg"
+	shutil.copy(src, dest)
 
+	# Write the label to file
+	val_labels_file.write(str(dp) + "\n")
 
-# Creates and prints out the histogram (this code works perfectly fine)
-# If you're curious about how many images we lost, etc.
+print " Done!"
 
-histogram_output_file = open("histogram.csv", "w")
-histogram = {}
-for key in face_counts:
-	#histogram_output_file.write(key + "," + str(face_counts[key]) + "\n")
-	if face_counts[key] not in histogram:
-		histogram[face_counts[key]] = 1
-	else:
-		histogram[face_counts[key]] += 1
-
-print histogram
-histogram_output_file.close()
-
-
-labels_file.close()
-single_labels_output_file.close()
-
-"""
+train_labels_file.close()
+val_labels_file.close()
