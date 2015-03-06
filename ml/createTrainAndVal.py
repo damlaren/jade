@@ -66,7 +66,7 @@ SINGLES_DIR = FACES_ROOT + "singles/"
 
 # Input labels file
 INPUT_LABELS_FILE = FACES_ROOT + "all_" + LABEL + ".txt"
-SUBDATASET_ROOT = "/home/ec2-user/" + LABEL + "/"
+SUBDATASET_ROOT = FACES_ROOT + LABEL + "/"
 
 # A class which keeps track of a filename, label pair
 class DataPoint:
@@ -176,11 +176,11 @@ for dp in training_set:
 	# Write the label to file
 	train_labels_file.write(str(dp) + "\n")
 	count += 1
-	if count % 10000 == 0:
+	if count % 50000 == 0:
 		print "Moved Training Images: " + str(count) + " / " + str(len(training_set)),
 		print "\tElapsed: " + str((time.time()-start_time)) 
 
-print " Done!"
+print "Finished moving training images!"
 print "Creating validation set folder and labels..."
 
 count = 0
@@ -195,11 +195,12 @@ for dp in validation_set:
 	# Write the label to file
 	val_labels_file.write(str(dp) + "\n")
 	count += 1
-	if count % 10000 == 0:
+	if count % 20000 == 0:
 		print "Moved Validation Images: " + str(count) + " / " + str(len(validation_set)),
 		print "\tElapsed: " + str((time.time()-start_time)) 
 
-print " Done!"
+print "Finished moving validation images!"
+print "The script is complete and you may begin training."
 
 train_labels_file.close()
 val_labels_file.close()
