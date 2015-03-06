@@ -164,7 +164,9 @@ if not os.path.exists(VAL_DIR):
 train_labels_file = open(SUBDATASET_ROOT + LABEL + "_train.txt", "w")
 val_labels_file = open(SUBDATASET_ROOT + LABEL + "_val.txt", "w")
 
-print "Creating training set folder and labels...",
+print "Creating training set folder and labels..."
+count = 0
+start_time = time.time()
 for dp in training_set:
 	filename = dp.getFilename()
 	src = SINGLES_DIR + filename
@@ -173,10 +175,16 @@ for dp in training_set:
 
 	# Write the label to file
 	train_labels_file.write(str(dp) + "\n")
+	count += 1
+	if count % 10000 == 0:
+		print "Moved Training Images: " + str(count) + " / " + str(len(training_set)),
+		print "\tElapsed: " + str((time.time()-start_time)) 
 
 print " Done!"
-print "Creating validation set folder and labels...",
+print "Creating validation set folder and labels..."
 
+count = 0
+start_time = time.time()
 for dp in validation_set:
 	filename = dp.getFilename()
 	# Not all images end with face_0 for some reason...
@@ -186,6 +194,10 @@ for dp in validation_set:
 
 	# Write the label to file
 	val_labels_file.write(str(dp) + "\n")
+	count += 1
+	if count % 10000 == 0:
+		print "Moved Validation Images: " + str(count) + " / " + str(len(validation_set)),
+		print "\tElapsed: " + str((time.time()-start_time)) 
 
 print " Done!"
 
