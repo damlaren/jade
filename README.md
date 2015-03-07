@@ -187,3 +187,53 @@ The `num_output` here should be equal to the number of output classes you have. 
 
 #### Regression
 For the `loss` layer we will use `EuclideanLoss` and have one output node from the fully connected `fc8` layer. This requires a different Data Preparation step which will be updated here soon. (Need to use HD5 format instead of LMDB)
+
+The final layer should look like the following (towards the end of the `train_val.prototxt`):
+```
+layer {
+  name: "fc8"
+  type: "InnerProduct"
+  bottom: "fc7"
+  top: "fc8"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  inner_product_param {
+    num_output: 1
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "loss"
+  type: "EuclideanLoss"
+  bottom: "fc8"
+  bottom: "label"
+  top: "loss"
+}
+```
+Notice the single output at the final FC layer. Also we are using Euclidean Loss. Notice we removed the accuracy layer:
+```
+layer {
+  name: "accuracy"
+  type: "Accuracy"
+  bottom: "fc8"
+  bottom: "label"
+  top: "accuracy"
+  include {
+    phase: TEST
+  }
+}
+```
+This is because for regression, accuracy doesn't make sense.
