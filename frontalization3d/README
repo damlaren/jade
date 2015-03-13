@@ -1,0 +1,23 @@
+See the README for frontalization code at http://www.openu.ac.il/home/hassner/projects/frontalize/ for more information.
+
+Set up instructions:
+
+1. Install OpenCV 2.4
+2. Start MATLAB and enter the frontalization3d directory.
+3. edit add_to_search_path.m to point to install directories of dependencies
+4. In the face-release-1.0-basic directory, run MATLAB's mex command on all .cc
+   on all .cc files, for example:
+
+   mex fconv.cc
+
+   I was not able to get fconvblas.cc to compile, but I was still able to run
+   the demo successfully.
+
+5. In the calib directory, recompile the calib library:
+
+   compile_calib(<opencv-install-directory>, false)
+
+   <opencv-install-directory> is the directory containing OpenCV's lib and
+   include directories. The 2nd argument is false because we use OpenCV 2.4.
+
+6. Run demo.m in the frontalization3d directory.
