@@ -60,7 +60,30 @@
 addpath calib
 
 % Load query image
-I_Q = imread('test.jpg');
+% query_image_fn = 'test.jpg';
+%query_image_fn = '../../pic5/train/00026eb27c4918da6470f236536be805.jpg';
+%query_image_fn = '../../pic5/train/0004cf6a5e1bc6000d3ae34c8448352d.jpg';
+%query_image_fn = '../../pic5/train/000636ca6fa58471450ff2ea9fcc1cd5.jpg';
+%query_image_fn = '../../pic5/train/0007eda5b2eabba9510a822a63362cdf.jpg';
+%query_image_fn = '../../pic5/train/000e76999e7ea78813557d39cef0b20a.jpg';
+%query_image_fn = '../../pic5/train/00137e5d2d01cd117ddde67a0215d63f.jpg';
+%query_image_fn = '../../pic5/train/0019819bbc6d3a385ccede43c6c69407.jpg';
+%query_image_fn = '../../pic5/train/001a294d3a951613e0eda94730d3fc83.jpg';
+%query_image_fn = '../../pic5/train/0021cb7c79c411585da13aac1de7592a.jpg';
+%query_image_fn = '../../pic5/train/0027c51f58901e6ffd8f2f3def2ef638.jpg';
+%query_image_fn = '../../pic5/train/002ea75da31e6254da923f98f7449a69.jpg';
+%query_image_fn = '../../pic5/train/003439fb0e5aae3c83976e5409cc4a99.jpg';
+%query_image_fn = '../../pic5/train/003b0241692402d4f3cd25397966da05.jpg';
+%query_image_fn = '../../pic5/train/003e32784b92b614998778e25b8a3b2d.jpg';
+%query_image_fn = '../../pic5/train/00429e2518a4c6b3247ef6e0df5bf846.jpg';
+%query_image_fn = '../../pic5/train/004365712443c6d575cf24922c95a5fc.jpg';
+%query_image_fn = '../../pic5/train/0046b2eb95c3e3110691d39aac8959a1.jpg';
+%query_image_fn = '../../pic5/train/004b42b5ef0f5b959bcb1a9d0d9a503c.jpg';
+%query_image_fn = '../../pic5/train/004ec5dda1901bb294c21d69abc6e292.jpg';
+query_image_fn = '../../pic5/train/0054461c76523cf202fbbc5ff64f8dc7.jpg';
+
+
+I_Q = imread(query_image_fn);
 
 % load some data
 load eyemask eyemask % mask to exclude eyes from symmetry
@@ -92,10 +115,14 @@ frontal_raw = imtransform(frontal_raw,REFTFORM,'XData',[1 REFSZ(2)], 'YData',[1 
     
 
 % Display results
-figure; imshow(I_Q); title('Query photo');
-figure; imshow(I_Q); hold on; plot(fidu_XY(:,1),fidu_XY(:,2),'.'); hold off; title('Query photo with detections overlaid');
-figure; imshow(frontal_raw); title('Frontalilzed no symmetry');
-figure; imshow(frontal_sym); title('Frontalilzed with soft symmetry');
+%figure; imshow(I_Q); title('Query photo');
+%figure; imshow(I_Q); hold on; plot(fidu_XY(:,1),fidu_XY(:,2),'.'); hold off; title('Query photo with detections overlaid');
+%figure; imshow(frontal_raw); title('Frontalilzed no symmetry');
+%figure; imshow(frontal_sym); title('Frontalilzed with soft symmetry');
 
-
-
+% Save results instead
+[pathname, filename, ext] = fileparts(query_image_fn);
+imwrite(I_Q, ['sample_results/', filename, ext]);
+%imwrite(['sample_results/', filename, '_keypts', ext]);
+imwrite(frontal_raw, ['sample_results/', filename, '_front_nosym', ext]);
+imwrite(frontal_sym, ['sample_results/', filename, '_front_softsym', ext]);
