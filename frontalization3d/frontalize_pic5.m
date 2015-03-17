@@ -1,7 +1,7 @@
 % Frontalize images in pic5 data set.
 % Adapted from provided file demo.m.
 
-clear all;
+function frontalize_pic5(start_file_index, end_file_index)
 
 add_to_search_path; % set up paths
 
@@ -33,12 +33,17 @@ load model3DZhuRamanan Model3D % reference 3D points corresponding to Zhu & Rama
 
 addpath calib
 
-error_file = fopen('errors.txt', 'w');
+error_file = fopen(sprintf('errors_%d_%d.txt', start_file_index, end_file_index), 'w');
 
 dir_files = dir(input_path);
 n_files = length(dir_files);
 
-for file_index = 1 : n_files
+if end_file_index > n_files
+  end_file_index = n_files;
+end
+
+for file_index = start_file_index : end_file_index
+%for file_index = 1 : n_files
   query_image_fn = [input_path, dir_files(file_index).name];
   if mod(file_index, 100) == 0
     file_index
@@ -103,6 +108,7 @@ try
 
 catch ME
   disp(['Failed to frontalize image: ', query_image_fn]);
+  file_index
   fprintf(error_file, ['Failed to frontalize image: ', query_image_fn, '\n']);
   continue;
 end
@@ -112,3 +118,5 @@ end
 disp(['all done?']);
 
 fclose(error_file);
+
+end
