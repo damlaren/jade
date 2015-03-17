@@ -82,7 +82,6 @@ addpath calib
 %query_image_fn = '../../pic5/train/004ec5dda1901bb294c21d69abc6e292.jpg';
 query_image_fn = '../../pic5/train/0054461c76523cf202fbbc5ff64f8dc7.jpg';
 
-
 I_Q = imread(query_image_fn);
 
 % load some data
