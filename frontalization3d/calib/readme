@@ -1,0 +1,67 @@
+OpenCV calibration code wrapper (mex file) for Linux. Used with the renderer function available from:
+http://www.openu.ac.il/home/hassner/projects/poses/
+
+This code was developed by Liav Assif and Tal Hassner, and was used in the following papers: 
+
+T. Hassner, Viewing Real-World Faces in 3D, International Conference on Computer Vision (ICCV), Sydney, Austraila, Dec. 2013
+T. Hassner, L. Assif, and L. Wolf, When Standard RANSAC is Not Enough: Cross-Media Visual Matching with Hypothesis Relevancy, Machine Vision and Applications (MVAP), Volume 25, Issue 4, Page 971-983, 2014
+
+If you find this code useful, please add suitable references in your work to either (or both) of these papers.
+
+Copyright 2013, Liav Assif and Tal Hassner
+
+The SOFTWARE ("renderer" and \ or  "calib") is provided "as is", without any guarantee made as to its suitability or fitness for any particular use.  It may contain bugs, so use of this tool is at your own risk. We take no responsibility for any damage that may unintentionally be caused through its use.
+
+Dependencies:
+OpenCV
+http://opencv.org/
+
+
+Calibration code
+----------------
+Please refer to the FAQ section at the renderer package readme for troubleshooting!
+
+A pre-compiled mex is available for Linux 64-bit. It is best to try to use it first.
+    For OpenCV 2.1: calib_cv2.1.mexa64
+    For OpenCV 2.4: calib_cv2.4.mexa64 
+Rename/link one of them as calib.mexa64.
+
+In version 1.0.1 we have also added precompiled Windows mex: calib.mexw64. The project webpage now includes also opencv binaries for windows to go along with this mex. 
+
+If needed, you can recompile the code using (from MATLAB):
+>> cd calib/
+>> compile_calib(LIB_PATH,USE_CV_TWO_ONE)
+LIB_PATH should be the path to OpenCV, e.g. '/usr' (can be left empty if OpenCV is installed system-wide) The libraries are expected at LIB_PATH/lib and the header files at LIB_PATH/include.
+USE_CV_TWO_ONE should be true for OpenCV 2.1 and false for OpenCV 2.4 (and possibly later versions as well). 
+
+NOTE:
+In order to be used from MATLAB OpenCV must be available to MATLAB, e.g. by modifying the LD_LIBRARY_PATH environment variable. There are several ways this can be achieved. The simplest way is to use the provided 'ldlibMatlab' scripts (ldlibMatlab.bash for BASH or ldlibMatlab.csh for TCSH/CSH) to start MATLAB (after modifying LIBS_PREFIX in these scripts to the appropriate locations). Other ways are possible and can be found in MATLAB's documentation. 
+
+Usage:
+[A,R,T]=doCalib(width,height,imPoints,objPoints,A,RGuess,TGuess)
+RGuess and TGuess are optional initial guesses (can supply [] instead). A must be provided. See the documentation at
+http://docs.opencv.org/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html
+for more information.
+
+See the pose estimation sanity example in demo.m from the renderer package:
+    [depth, rendered, unproject, A, R, T]=renderer(width, height, model_name);
+    figure, imshow(rendered);
+
+    % collect dummy landmarks from the 2D rendered image and the 3D model points
+    % If you are fitting a different 2D image (texture), first resize it. e.g.
+    %   texture=imresize(your_texture,[height width]);
+    % Next, annotate m points (landmarks) from 'texture' (2D points) into pts_2D (m by 2 matrix) and 'unproject' (3D points) into pts_3D (m by 3 matrix).
+    pts_2D=[183,22; 135,106; 159,83; 132,187; 141,210; 130,229];
+    hold on; plot(pts_2D(:,1),pts_2D(:,2),'+')
+    pts_3D=zeros(size(pts_2D,1),3);
+    for j=1:size(pts_2D,1)
+        pts_3D(j,:)=unproject(pts_2D(j,2),pts_2D(j,1),1:3);
+    end;
+    
+    % calibrate - estimate the new camera matrices
+    addpath('../calib/')
+    [A,R_new,T_new]=doCalib(width,height,pts_2D,pts_3D,A,[],[]);
+    
+    % rendered_new should be almost equal to the original rendered
+    [~, rendered_new]=renderer(width, height, model_name,0,0,A,R_new,T_new);
+    figure, imshow(rendered_new);
