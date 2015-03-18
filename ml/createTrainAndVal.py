@@ -26,13 +26,13 @@ author: Albert Haque
 
 # The labels to use: must be one of: (exact match)
 # "age" "agr" "con" "ext" "gender" "neu" "ope" "SWL"
-LABEL = "con"
+LABEL = "gender"
 
 # This is the folder that contains the singles folder and where
 # all subdatasets will be stored. A subdataset is the dataset (train/val)
 # for a single label (e.g. age). See directory tree below
 # Please include the slash at the end
-FACES_ROOT = "/home/ec2-user/faces_data/"
+FACES_ROOT = "/home/albert/Desktop/tophalf/"
 
 """
 Output directory location. The folder structure will be like such:
@@ -56,7 +56,7 @@ FACES_ROOT
 
 # Out of our entire dataset (with labels),
 # how much should be allocated to the validation set
-VAL_PERCENT = 0.05
+VAL_PERCENT = 0.1
 
 # END REQUIRED INPUTS
 #######################################################################
@@ -67,6 +67,10 @@ SINGLES_DIR = FACES_ROOT + "singles/"
 # Input labels file
 INPUT_LABELS_FILE = FACES_ROOT + "all_" + LABEL + ".txt"
 SUBDATASET_ROOT = FACES_ROOT + LABEL + "/"
+
+def extractImageId(filename):
+	extension_start_index = filename.find(".")
+	return filename[:extension_start_index]
 
 # A class which keeps track of a filename, label pair
 class DataPoint:
@@ -98,7 +102,13 @@ class DataPoint:
 print "Label:\t\t" + LABEL
 
 # Get list of all files present in singles folder
-singles_list = set(os.listdir(SINGLES_DIR))
+singles_list1 = os.listdir(SINGLES_DIR)
+singles_list2 = []
+
+for filename in singles_list1:
+	singles_list2.append(extractImageId(filename.replace(".aligned","")))
+
+singles_list = set(singles_list2)
 
 # Get the list of images in our labels file that are present in singles folder
 # The ready_set is defined as the set of images for which we have labels for
@@ -115,9 +125,10 @@ found_count = 0
 start_time = time.time()
 for line in lines:
 	tokens = line.strip().split(' ')
+	imageid = extractImageId(tokens[0])
 	# If this label does in fact have a single face detection
-	if tokens[0] in singles_list:
-		dp = DataPoint(tokens[0], tokens[1], LABEL)
+	if imageid in singles_list:
+		dp = DataPoint(imageid, tokens[1], LABEL)
 		ready_set.append(dp)
 		found_count += 1
 
@@ -169,14 +180,14 @@ count = 0
 start_time = time.time()
 for dp in training_set:
 	filename = dp.getFilename()
-	src = SINGLES_DIR + filename
-	dest = TRAIN_DIR + filename + ".jpg"
+	src = SINGLES_DIR + filename + ".aligned.png"
+	dest = TRAIN_DIR + filename + ".png"
 	shutil.copy(src, dest)
 
 	# Write the label to file
-	train_labels_file.write(str(dp) + "\n")
+	train_labels_file.write(str(dp.filename) + ".png " + str(dp.label) + "\n")
 	count += 1
-	if count % 50000 == 0:
+	if count % 5000 == 0:
 		print "Moved Training Images: " + str(count) + " / " + str(len(training_set)),
 		print "\tElapsed: " + str((time.time()-start_time)) 
 
@@ -188,14 +199,14 @@ start_time = time.time()
 for dp in validation_set:
 	filename = dp.getFilename()
 	# Not all images end with face_0 for some reason...
-	src = SINGLES_DIR + filename
-	dest = VAL_DIR + filename + ".jpg"
+	src = SINGLES_DIR + filename + ".aligned.png"
+	dest = VAL_DIR + filename + ".png"
 	shutil.copy(src, dest)
 
 	# Write the label to file
-	val_labels_file.write(str(dp) + "\n")
+	val_labels_file.write(str(dp.filename) + ".png " + str(dp.label) + "\n")
 	count += 1
-	if count % 20000 == 0:
+	if count % 5000 == 0:
 		print "Moved Validation Images: " + str(count) + " / " + str(len(validation_set)),
 		print "\tElapsed: " + str((time.time()-start_time)) 
 
