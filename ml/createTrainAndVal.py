@@ -26,7 +26,7 @@ author: Albert Haque
 
 # The labels to use: must be one of: (exact match)
 # "age" "agr" "con" "ext" "gender" "neu" "ope" "SWL"
-LABEL = "gender"
+LABEL = "ext"
 
 # This is the folder that contains the singles folder and where
 # all subdatasets will be stored. A subdataset is the dataset (train/val)
