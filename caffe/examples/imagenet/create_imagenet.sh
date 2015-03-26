@@ -2,12 +2,12 @@
 # Create the imagenet lmdb inputs
 # N.B. set the path to the imagenet train + val data dirs
 
-EXAMPLE=examples/imagenet
-DATA=data/ilsvrc12
-TOOLS=build/tools
+EXAMPLE=/home/albert/caffe/examples/imagenet
+DATA=/home/albert/caffe/data/ilsvrc12
+TOOLS=/home/albert/caffe/build/tools
 
-TRAIN_DATA_ROOT=/home/albert/Desktop/pic5_dataset/train/
-VAL_DATA_ROOT=/home/albert/Desktop/pic5_dataset/val/
+TRAIN_DATA_ROOT=/home/albert/Desktop/faces_data/con/train/
+VAL_DATA_ROOT=/home/albert/Desktop/faces_data/con/val/
 
 # Set RESIZE=true to resize the images to 256x256. Leave as false if images have
 # already been resized using another tool.
@@ -41,7 +41,7 @@ GLOG_logtostderr=1 $TOOLS/convert_imageset \
     --resize_width=$RESIZE_WIDTH \
     --shuffle \
     $TRAIN_DATA_ROOT \
-    $DATA/pic5_gender_train.txt \
+    $DATA/con_train.txt \
     $EXAMPLE/ilsvrc12_train_lmdb
 
 echo "Creating val lmdb..."
@@ -51,7 +51,7 @@ GLOG_logtostderr=1 $TOOLS/convert_imageset \
     --resize_width=$RESIZE_WIDTH \
     --shuffle \
     $VAL_DATA_ROOT \
-    $DATA/pic5_gender_val.txt \
+    $DATA/con_val.txt \
     $EXAMPLE/ilsvrc12_val_lmdb
 
 echo "Done."
